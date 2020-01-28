@@ -714,6 +714,7 @@ Language primitives are compatible to other libraries, while domain primitives a
 The same domain primitive, cannot be reused as each domain primitive should serve one purpose
 
 For example, *name* and *surname* should be represented by two domain primitives
+
 ---
 
 class: impact
