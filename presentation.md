@@ -24,17 +24,18 @@ class: impact
 
 # Order Number
 
-An order number is a 10 digit number as shown next
+An order number is a 10-digit number as shown next:
 
 ```
 0980810031
 ```
 
-With an exception for stock.  Stock orders have a `-` as their second digit
+The exception is for Stock, whose orders have a `-` as their second digit:
 
 ```
 0-21200545
 ```
+
 ---
 
 # Representation
@@ -45,7 +46,7 @@ How can we represent this value in our code?
 
 # String Representation
 
-We can represent the *Order Number* as `String`
+We can represent the *Order Number* as a `String`:
 
 ```kotlin
 data class Order(val orderNumber: String)
@@ -67,30 +68,36 @@ object OrderRepository {
 
 # Challenges
 
-While all *Order Number*s are `String`s, not all `String`s are *Order Number*s
+However, while all *Order Number*s are `String`s, not all `String`s are *Order Number*s.
 
-A very small subset of `String`s are *Order Number*s
+Only a very small subset of `String`s are *Order Number*s.
 
-The `String` data type is too generic
+So the `String` data type is too generic.
+
+There is something particular about *Order Number*s that we need to capture in our model.
 
 ---
 
-# All `String`s Will Do
+# An Example
 
-We can pass any `String` to any function that requires an *Order Number*
+For example, let's say we pass a random `String` to a function that requires an *Order Number*:
 
 ```kotlin
 val order = Order("any random string will do")
 println("$order")
 ```
 
-The above code will compile, even though the provided `String` is not an *Order Number*
+The above code will compile, even though the provided `String` is not an *Order Number*.
+
+So the `String` data type is too generic. We need an alternative.
 
 ---
 
 # A Possible Solution
 
-We can add validation to ensure that the values passed are *Order Number*s 
+We could add validation to ensure that the values passed are *Order Number*s.
+
+Take for example this function for checking whether something is really an *Order Number*:
 
 ```kotlin
 object OrderNumberValidation {
@@ -104,36 +111,30 @@ object OrderNumberValidation {
 }
 ```
 
----
-
-# Use Validation
-
-We can check the arguments before using them, and fail accordingly
+Then we could use `init` to check an argument before using it, and fail accordingly:
 
 ```kotlin
 data class Order(val orderNumber: String) {
-  init {
-    OrderNumberValidation.check(orderNumber)
-  }
+  init { OrderNumberValidation.check(orderNumber) }
 }
 ```
 
-We can use the same approach for all the other usage
+We can use the same approach for all the other usages.
 
 ---
 
 # Polluted Tests
 
-A test needs to be added to every function that takes an *Order Number* as its input.  
+A test needs to be added for every function that takes an *Order Number* as its input.
 
-This will pollute the tests as we need to make sure that the inputs are properly checked
+This will pollute the tests as we need to make sure that the inputs are properly checked:
 
 ```kotlin
 @Test
 fun `should throw an exception if passed an invalid order number`() {
-    assertFailsWith<IllegalArgumentException> {
-        Order("a random string that it is not an Order Number")
-    }
+  assertFailsWith<IllegalArgumentException> {
+    Order("a random string that it is not an Order Number")
+  }
 }
 ```
 
@@ -141,9 +142,9 @@ fun `should throw an exception if passed an invalid order number`() {
 
 # The Forgotten Compiler
 
-We are polluting the tests as we are not taking advantage of the compiler
+We are polluting the tests because we are not taking advantage of the compiler.
 
-For example, if we pass an `Int` to a function that expects a `String`, the compiler will complain
+For example, if we pass an `Int` to a function that expects a `String`, the compiler will complain:
 
 ```kotlin
 fun aFunctionThatTakeAString(string: String) {}
@@ -151,7 +152,7 @@ fun aFunctionThatTakeAString(string: String) {}
 aFunctionThatTakeAString(42)
 ```
 
-We don't need to have a tests for these cases as the compiler will handle them
+We don't need to have tests for these cases as the compiler will handle them.
 
 ---
 
@@ -163,37 +164,37 @@ We don't need to have a tests for these cases as the compiler will handle them
 
 # Alternative Approach
 
-Instead of using a language primitive to represent data types we can use domain primitives
+Instead of using a *language primitive* to represent our data types, we can use a *domain primitive*:
 
 ```kotlin
-data class OrderNumber private constructor(val value: String) {
-    companion object {
-        @Throws(IllegalArgumentException::class)
-        operator fun invoke(value: String): OrderNumber {
-            require(value.length == 10) { "Invalid order number" }
-            return OrderNumber(value)
-        }
+data class OrderNumber private constructor(val value: String) { 
+  companion object {
+    @Throws(IllegalArgumentException::class)
+    operator fun invoke(value: String): OrderNumber { 
+      require(value.length == 10) { "Invalid order number" }
+      return OrderNumber(value)
     }
+  }    
 }
 ```
 
 ---
 
-# Is This A *Value Object*?
+# Is This a *Value Object*?
 
-*Domain Primitives* are sometimes referred to as *Value Objects*, but there are some key differences
+*Domain Primitives* are sometimes referred to as *Value Objects*, but there are some key differences.
 
-*Value Objects* are usually used to represent types that are not available as a *Language Primitive*, such as `Money` or `Address`
+*Value Objects* are usually used to represent types that are not available as a *language primitive*, such as `Money` or `Address`.
 
-While similar, *Domain Primitives* ensure that all instances are valid values of that type and types are not reused, especially between context
+While similar, *Domain Primitives* additionally ensure that all instances are valid values of that type, and also that types are not reused, especially between contexts.
 
-For example, the `Name` *Domain Primitive* cannot be used to represent persons' name and computers' name at the same time.  We will have two *Domain Primitives* in such case, `PersonName` and `ComputerName`
+For example, the `Name` *Domain Primitive* cannot be used to represent a person's name and a computer's name at the same time. In such a case, we would have two *Domain Primitives*:, `PersonName` and `ComputerName`.
 
 ---
 
-# Use Of Domain Primitives
+# Use of Domain Primitives
 
-Instead of `String`s, we can now use `OrderNumber`
+Instead of `String`, we can now use `OrderNumber`:
 
 ```kotlin
 data class Order(val orderNumber: OrderNumber)
@@ -213,28 +214,28 @@ object OrderRepository {
 
 ---
 
-# Take Advantage Of Compiler
+# Take Advantage of the Compiler
 
-We cannot create an `Order` with any random `String`, nor pass it to any function that requires an `OrderNumber`
+Now we cannot create an `Order` with any random `String`, nor pass it to any function that requires an `OrderNumber`:
 
 ```kotlin
 val order = Order("any random string will not do")
 println("$order")
 ```
 
-The above will not compile
+The above will not compile.
 
 ---
 
 # Less Test Pollution
 
-We only need to make sure that only valid `OrderNumber`s can be created, and fail accordingly
+We now need only to make sure that only valid `OrderNumber`s can be created, and fail accordingly:
 
 ```kotlin
-@Test
-fun `should throw an exception when given an invalid order number`() {
+@Test 
+fun `should throw an exception when given an invalid order number`() { 
   val invalidOrdersNumbers = 
-          listOf("", "to long to be a valid order number")
+        listOf("", "to long to be a valid order number") 
   invalidOrdersNumbers.forEach {
     assertFailsWith<IllegalArgumentException> { OrderNumber(it) }
   }
@@ -245,7 +246,7 @@ fun `should throw an exception when given an invalid order number`() {
 
 # Sealed Classes
 
-Another approach is to use seal classes instead of throwing exceptions
+Another approach would be to use sealed classes instead of throwing exceptions:
 
 ```kotlin
 sealed class OrderNumber {
@@ -267,7 +268,7 @@ sealed class OrderNumber {
 
 # Streamlined Usage
 
-Sealed Classes are a preferred option as these streamline the usage
+Sealed classes are the preferred option, as these streamline the usage:
 
 ```kotlin
 when(OrderNumber("some random string")) {
@@ -276,7 +277,7 @@ when(OrderNumber("some random string")) {
 }
 ```
 
-This example did not include a `companion object` in the `OrderNumber` class due to slides size constraints
+(Note: This example did not include a `companion object` in the `OrderNumber` class due to slide size constraints.)
 
 ---
 
@@ -667,7 +668,6 @@ For example, the `java.util.Timer`, will stop running if the `java.util.TimerTas
 That's may be unexpected behaviour and you would like to swap the `java.util.Timer` class to the `java.util.concurrent.ScheduledExecutorService` class
 
 Having tight coupling between the application and the `java.util.Timer` would prove such take harder than expected
-
 
 ---
 
