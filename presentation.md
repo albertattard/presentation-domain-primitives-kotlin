@@ -12,13 +12,13 @@ layout: true
 class: impact
 
 # {{title}}
-## Building Better Software
+## Small Steps Towards Better Software
 
 ---
 
 class: impact
 
-# Data Types
+# Representation
 
 ---
 
@@ -160,6 +160,8 @@ We don't need to have tests for these cases as the compiler will handle them.
 
 .center[![Center-aligned image](assets/images/Test Pyramid.png)]
 
+TODO: See alternatives for compilers for languages that do not use one, such as Php or Javascript
+
 ---
 
 # Alternative Approach
@@ -188,7 +190,7 @@ data class OrderNumber private constructor(val value: String) {
 
 While similar, *Domain Primitives* additionally ensure that all instances are valid values of that type, and also that types are not reused, especially between contexts.
 
-For example, the `Name` *Domain Primitive* cannot be used to represent a person's name and a computer's name at the same time. In such a case, we would have two *Domain Primitives*:, `PersonName` and `ComputerName`.
+For example, the `Name` *Domain Primitive* cannot be used to represent a person's name and a computer's name at the same time. In such a case, we would have two *Domain Primitives*: `PersonName` and `ComputerName`.
 
 ---
 
@@ -235,7 +237,7 @@ We now need only to make sure that only valid `OrderNumber`s can be created, and
 @Test 
 fun `should throw an exception when given an invalid order number`() { 
   val invalidOrdersNumbers = 
-        listOf("", "to long to be a valid order number") 
+        listOf("", "too long to be a valid order number") 
   invalidOrdersNumbers.forEach {
     assertFailsWith<IllegalArgumentException> { OrderNumber(it) }
   }
