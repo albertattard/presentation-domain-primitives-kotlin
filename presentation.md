@@ -289,141 +289,27 @@ class: impact
 
 ---
 
-# What Is What?
+# To Err is Human
 
-The `Measurements` data class comprise a list of `BigDecimal`s and the `slice()` function returns a new instance of the `Measurements` data class with a subset of its parent's class elements.
+Air Canada Flight 143 ran out of fuel on July 23, 1983, at an altitude of 41,000 feet (12,000 m), midway through the flight
 
-What values is the `slice()` function, shown next, expecting?
+The use of the incorrect conversion factor led to a total fuel load of only 22,300 pounds (10,100 kg) rather than the 22,300 kilograms that was needed
 
-```kotlin
-data class Measurements(private val elements: List<BigDecimal>) {
+The crew was able to glide the Boeing 767 aircraft safely to an emergency landing
 
-  fun slice(a: Int, b: Int): Measurements { }
-}
-```
+.center[![Center-aligned image](assets/images/Flight 143 after landing at Gimli Manitoba.png)]
 
 ---
 
-# What Will We Get?
+# Bigger Than We Think
 
-Is it the *start index* as the first parameter and *length* as the second?
+NASA’s Climate Orbiter was lost on September 23, 1999, due to metric/imperial mishap
 
-Or is it the *start index* as the first parameter and the *end index* as the second parameter?
-
-```kotlin
-val original = Measurements( listOf(BigDecimal("0.01"), 
-                 BigDecimal("0.34"), BigDecimal("2.67"), 
-                 BigDecimal("1.002")) )
-val slice = original.slice(1, 2)
-```
-
-Can we have both options?
+.center[![Center-aligned image](assets/images/Climate Orbiter.png)]
 
 ---
 
-# Use A `Range` Domain Primitive
-
-Instead of using two language primitives, we can create a new domain primitive that defines the slice to be returned 
-
-```kotlin
-data class Measurements(private val elements: List<BigDecimal>) {
-
-    fun slice(a: Range): Measurements { }
-}
-```
-
-But how will this solve this problem?
-
----
-
-# The `Range` Domain Primitive
-
-```kotlin
-data class Range private constructor(
-    val start: StartIndex, val end: EndIndex) {
-  companion object {
-    @Throws(IllegalArgumentException::class)
-    operator fun invoke(start: StartIndex, end: EndIndex): Range {
-        require(start.value <= end.value) { "Invalid range" }
-        return Range(start, end)
-    }
-
-    operator fun invoke(start: StartIndex, length: Length) =
-      Range(start, start.endIndex(length))
-  }
-}
-```
-
----
-
-# The `StartIndex`
-
-```kotlin
-data class StartIndex private constructor(val value: Int) {
-  companion object {
-    @Throws(IllegalArgumentException::class)
-    operator fun invoke(value: Int): StartIndex {
-        require(value >= 0) { "Invalid start index" }
-        return StartIndex(value)
-    }
-  }
-
-  fun endIndex(length: Length) =
-    EndIndex(value + length.value);
-}
-```
-
----
-
-# The `EndIndex`
-
-```kotlin
-data class EndIndex private constructor(val value: Int) {
-  companion object {
-    @Throws(IllegalArgumentException::class)
-    operator fun invoke(value: Int): EndIndex {
-        require(value >= 0) { "Invalid end index" }
-        return EndIndex(value)
-    }
-  }
-}
-```
-
----
-
-# The `Length`
-
-```kotlin
-data class Length private constructor(val value: Int) {
-  companion object {
-    @Throws(IllegalArgumentException::class)
-    operator fun invoke(value: Int): Length {
-        require(value >= 0) { "Invalid length" }
-        return Length(value)
-    }
-  }
-}
-```
-
----
-
-# Celsius Or Fahrenheit 
-
-Converting between Celsius to Fahrenheit, and vice versa, is a typical example found in many programming textbooks.
-
-```kotlin
-fun toCelsius(fahrenheit: Double) =
-    (fahrenheit - 32.0) * 5.0 / 9.0
-
-fun toFahrenheit(celsius: Double) =
-    (celsius * 9.0 / 5.0) + 32.0
-```
-
-As shown above, the conversion is quite simple and straightforward
-
----
-
-# Controller 
+# A Simple Example 
 
 Our air-conditioner controller works with Celsius and has the following function, which is used to control the power of the compressor 
 
@@ -433,13 +319,17 @@ fun adjustPower(celsius: Double) {  }
 
 Say that the temperature is `18°C`, but by mistake the Fahrenheit equivalent is given instead (`64.4°F`)
 
-The controller will think that it's too hot and will put the compressors to full power
+```kotlin
+adjustPower(64.4) /* by mistake instead of 18 */
+```
+
+The controller will think that it's too hot and will put the air-conditioner to full power
 
 ---
 
-# How Can We Address This? 
+# How can we Mitigate such Problems?
 
-While we can easily convert between one temperature unit to another, we cannot tell in which unit the temperature is
+While we can easily convert between one temperature unit to another, we cannot tell in which unit the temperature is by just looking at the number
 
 Can we use an `enum` to identify the unit, as shown next?
 
@@ -448,12 +338,12 @@ enum class TemperatureUnit {
     CELSIUS, FAHRENHEIT
 }
 
-fun adjustPower(celsius: Double, unit: TemperatureUnit) {  }
+fun adjustPower(temperature: Double, unit: TemperatureUnit) {  }
 ```
 
 ---
 
-# Domain Primitives? 
+# Another Approach
 
 Using `enum` will work, but we can do better
 
@@ -463,9 +353,9 @@ sealed class Temperature {
   abstract fun toCelsius(): Celsius
   abstract fun toFahrenheit(): Fahrenheit
 
-  data class Celsius(val celsius: Double) : Temperature() { }
+  data class Celsius(val value: Double) : Temperature() { }
 
-  data class Fahrenheit(val fahrenheit: Double) : Temperature() { }
+  data class Fahrenheit(val value: Double) : Temperature() { }
 }
 ```
 
@@ -500,11 +390,19 @@ This will ensure that the controller always work with Celsius, irrespective of t
 
 ---
 
-# Bigger Than We Think
+# Beyond Conversions
 
-NASA’s Climate Orbiter was lost September 23, 1999 due to metric/imperial mishap ([http://edition.cnn.com/TECH/space/9909/30/mars.metric/](http://edition.cnn.com/TECH/space/9909/30/mars.metric/))
+The ambiguity problem goes beyond simple conversions
 
-.center[![Center-aligned image](assets/images/Climate Orbiter.png)]
+Say you have a function that sets an order's delivery date as shown next
+
+```kotlin
+fun dispatchOrderOn(a: Int, b: Int, c: Int) { }
+```
+
+This function takes the day of the month, the month and the year as its parameters
+
+By looking at the method signature, can you tell which is the month parameter and is it `0` based (that is, `0` is equivalent to January)?
 
 ---
 
@@ -514,7 +412,7 @@ class: impact
 
 ---
 
-# Password
+# Leaking Sensitive Information
 
 How many times have we printed a password, or other sensitive information, by mistake?
 
@@ -526,7 +424,7 @@ val credentials = Credentials("username",
 println("Logging into the system using: $credentials")
 ```
 
-Will print the very long and secure password
+The above example will print the very long and secure password
 
 ```
 ... password=a very secure long password that it is very hard to guess
@@ -560,7 +458,7 @@ val credentials = Credentials(
 println("Password: ${credentials.password.value}")
 ```
 
-The above example will print the password value
+The above example will still print the password value
 
 ```
 Password: a very secure long password that it is very hard to guess
@@ -568,13 +466,15 @@ Password: a very secure long password that it is very hard to guess
 
 ---
 
-# Limit The Number of Reads 
+# Can we Address this Somehow?
 
 This is an area where domain primitives shine
 
 Say that in our context, the password is only required to be read once, just to log into the system
 
-If the password is read more than once, then we should fail and unplanned reads will not go unnoticed
+If the password is read more than once, then we should fail as that's not the expected behaviour
+
+Any unplanned reads will not go unnoticed
 
 ---
 
@@ -669,7 +569,7 @@ For example, the `java.util.Timer`, will stop running if the `java.util.TimerTas
 
 That's may be unexpected behaviour and you would like to swap the `java.util.Timer` class to the `java.util.concurrent.ScheduledExecutorService` class
 
-Having tight coupling between the application and the `java.util.Timer` would prove such take harder than expected
+Having tight coupling between the application and the `java.util.Timer` may prove harder than expected
 
 ---
 
@@ -678,9 +578,15 @@ Having tight coupling between the application and the `java.util.Timer` would pr
 *Domain Primitives* can act as an abstraction layer between the *Language Primitives*, such as the `java.util.Timer` class, and the rest of the application
 
 ```kotlin
-class CronJob(function: () -> Unit) {
+class CronJobTask {}
 
-    fun runAtFixRate(initialDelay: InitialDelay, delay: Delay): CronJob { }
+class CronJob {
+
+    fun runAtFixRate(
+          initialDelay: InitialDelay, 
+          delay: Delay,
+          block: () -> Any
+        ): CronJobTask { }
 }
 ```
 
