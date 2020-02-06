@@ -301,7 +301,7 @@ The crew was able to glide the Boeing 767 aircraft safely to an emergency landin
 
 ---
 
-# Bigger Than We Think
+# Bigger than we think
 
 NASA’s Climate Orbiter was lost on September 23, 1999, due to metric/imperial mishap
 
@@ -311,13 +311,13 @@ NASA’s Climate Orbiter was lost on September 23, 1999, due to metric/imperial 
 
 # A Simple Example 
 
-Our air-conditioner controller works with Celsius and has the following function, which is used to control the power of the compressor 
+Let say that we have an air-conditioner controller that works with Celsius and has the following function, which is used to control the power of the compressor 
 
 ```kotlin
 fun adjustPower(celsius: Double) {  }
 ```
 
-Say that the temperature is `18°C`, but by mistake the Fahrenheit equivalent is given instead (`64.4°F`)
+Say that the temperature is `18°C`, but by mistake the Fahrenheit equivalent is provided instead (`64.4°F`)
 
 ```kotlin
 adjustPower(64.4) /* by mistake instead of 18 */
@@ -432,7 +432,7 @@ The above example will print the very long and secure password
 
 ---
 
-# How Can We Prevent That?
+# How can we prevent that?
 
 We can prevent the password from being printed by using a domain primitive and overriding the `toString()` function
 
@@ -446,7 +446,7 @@ data class Password(val value: String) {
 
 ---
 
-# But What About …
+# But what about …
 
 We can still print the password by getting its value
 
@@ -466,7 +466,7 @@ Password: a very secure long password that it is very hard to guess
 
 ---
 
-# Can we Address this Somehow?
+# Can we address this somehow?
 
 This is an area where domain primitives shine
 
@@ -478,7 +478,7 @@ Any unplanned reads will not go unnoticed
 
 ---
 
-# How Can We Do That? 
+# How can we do that? 
 
 ```kotlin
 class Password(value: String) {
@@ -498,7 +498,7 @@ class Password(value: String) {
 
 ---
 
-# How Does This Work? 
+# How does this work? 
 
 ```kotlin
 val credentials = Credentials(Username("a"), Password("b"))
@@ -518,7 +518,7 @@ java.lang.IllegalStateException: Password was already consumed
 
 ---
 
-# Is This A Silver Bullet? 
+# Is this a Silver Bullet? 
 
 No!!
 
@@ -538,11 +538,11 @@ repeat(100) {
 
 class: impact
 
-# Refactoring
+# Tight Coupling
 
 ---
 
-# Coupling With Language Primitives 
+# Coupling with Language Primitives 
 
 Say that we need to schedule some tasks to run every so ofter, like a cron job
 
@@ -561,7 +561,7 @@ timer.scheduleAtFixedRate(task, 1000, 1000)
 
 ---
 
-# What's Wrong With That? 
+# What's wrong with that? 
 
 Without an abstraction layer between the language primitives types and the application, swapping the `java.util.Timer` class could be harder than expected
 
@@ -573,12 +573,12 @@ Having tight coupling between the application and the `java.util.Timer` may prov
 
 ---
 
-# Introducing An Abstraction Layer 
+# Introducing an Abstraction Layer 
 
 *Domain Primitives* can act as an abstraction layer between the *Language Primitives*, such as the `java.util.Timer` class, and the rest of the application
 
 ```kotlin
-class CronJobTask {}
+class CronJobTask { }
 
 class CronJob {
 
@@ -590,7 +590,13 @@ class CronJob {
 }
 ```
 
-Swapping the internals of the `CronJob` class should not effect any other part of the application
+---
+
+# Simplifying Refactoring 
+
+Swapping the internals of the `CronJob` and `CronJobTask` classes should not effect any other part of the application
+
+Tests can ensure that these domain primitives are still behaving as expected
 
 ---
 
@@ -602,7 +608,7 @@ class: impact
 
 # Verbosity
 
-Domain Primitives may reduce ambiguity and improves security, but at the expense of verbosity
+Domain primitives may reduce ambiguity and improve security, but at the expense of verbosity
 
 ```kotlin
 original.slice(1, 2)
@@ -621,7 +627,9 @@ Language primitives are compatible to other libraries, while domain primitives a
 
 The same domain primitive, cannot be reused as each domain primitive should serve one purpose
 
-For example, *name* and *surname* should be represented by two domain primitives
+For example, *name* and *surname* should be represented by two domain primitives and not by one domain primitive
+
+This may lead to class explosion as many classes are needed
 
 ---
 
@@ -629,3 +637,5 @@ class: impact
 
 # Thank You
 ## Feedback makes us better
+
+Please send any feedback to: albert.attard@thoughtworks.com
