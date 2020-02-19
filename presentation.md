@@ -18,6 +18,14 @@ class: impact
 
 class: impact
 
+## Albert Attard & Cristian Benedit
+
+Programmers._name_ @ **Thought**Works .com
+
+---
+
+class: impact
+
 # Representation
 
 ---
@@ -89,7 +97,7 @@ println("$order")
 
 The above code will compile, even though the provided `String` is not an *Order Number*.
 
-So the `String` data type is too generic. We need an alternative.
+So the `String` data type is too generic and we need to cater for that
 
 ---
 
@@ -182,7 +190,7 @@ data class OrderNumber private constructor(val value: String) {
 
 ---
 
-# Is This a *Value Object*?
+# Is this a *Value Object*?
 
 *Domain Primitives* are sometimes referred to as *Value Objects*, but there are some key differences.
 
@@ -351,7 +359,6 @@ Using `enum` will work, but we can do better
 sealed class Temperature {
 
   abstract fun toCelsius(): Celsius
-  abstract fun toFahrenheit(): Fahrenheit
 
   data class Celsius(val value: Double) : Temperature() { }
 
@@ -367,9 +374,13 @@ sealed class Temperature {
 data class Celsius(val value: Double) : Temperature() {
   override fun toCelsius() =
     this
+}
+```
 
-  override fun toFahrenheit() =
-    Fahrenheit((value * 9.0 / 5.0) + 32.0)
+```kotlin
+data class Fahrenheit(val value: Double) : Temperature() {
+  override fun toCelsius() =
+    Celsius((value - 32) * 5.0 / 9.0)
 }
 ```
 
@@ -569,7 +580,7 @@ For example, the `java.util.Timer`, will stop running if the `java.util.TimerTas
 
 That's may be unexpected behaviour and you would like to swap the `java.util.Timer` class to the `java.util.concurrent.ScheduledExecutorService` class
 
-Having tight coupling between the application and the `java.util.Timer` may prove harder than expected
+Having tight coupling between the application and the `java.util.Timer`, swapping may prove harder than expected
 
 ---
 
@@ -596,7 +607,7 @@ class CronJob {
 
 Swapping the internals of the `CronJob` and `CronJobTask` classes should not effect any other part of the application
 
-Tests can ensure that these domain primitives are still behaving as expected
+Tests can ensure that these domain primitives are still behaving as expected, especially after swapping their internals
 
 ---
 
@@ -610,8 +621,15 @@ class: impact
 
 Domain primitives may reduce ambiguity and improve security, but at the expense of verbosity
 
+Consider a function that takes two integers
+
 ```kotlin
 original.slice(1, 2)
+```
+
+An alternative approach that uses domain primitives is quite more verbose
+
+```kotlin
 original.slice(Range(StartIndex(1), Length(2)))
 ```
 
@@ -621,13 +639,15 @@ original.slice(Range(StartIndex(1), Length(2)))
 
 Language primitives are compatible to other libraries, while domain primitives are not and need to be converted back and forth
 
+For example, we cannot save a domain primitive representing a persons' name, such as `PersonName`, into a database.  We need to get the `String` equivalent 
+
 ---
 
-# Misuse
+# Class Explosion
 
-The same domain primitive, cannot be reused as each domain primitive should serve one purpose
+The same domain primitive cannot be reused for different purposes as each domain primitive should serve one purpose
 
-For example, *name* and *surname* should be represented by two domain primitives and not by one domain primitive
+For example, *name* and *surname* should be represented by two domain primitives, such as `Name` and `Surname`, and not by one, generic, domain primitive, such as `GenericName`
 
 This may lead to class explosion as many classes are needed
 
@@ -639,3 +659,9 @@ class: impact
 ## Feedback makes us better
 
 Please send any feedback to: albert.attard@thoughtworks.com
+
+---
+
+class: impact
+
+.center.hiring[![TW Careers](assets/images/TW Careers 1.png)]

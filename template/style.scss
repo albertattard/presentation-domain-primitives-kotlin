@@ -1,10 +1,10 @@
 // Theme
 // ---------------------------------------------------------------------------
 
-$primary          : #668042;
+$primary          : #672966;
 $secondary        : #009688;
 $tertiary         : #757575;
-$light            : #FFF;
+$light            : #FFFFFF;
 $dark             : #333;
 $text-dark        : #212121;
 $text-light       : $light;
@@ -83,6 +83,12 @@ blockquote {
   h1 { font-size: $font-size-impact; }
 }
 
+.hiring {
+  background-color: $primary;
+  vertical-align: middle;
+  text-align: center;
+}
+
 .full {
   &, h1, h2 { color: $text-light; }
   &iframe {
@@ -145,22 +151,13 @@ blockquote {
 .center { text-align: center; }
 .justify { text-align: justify; }
 .primary { color: $primary; }
-.primary-bg { background-color: $primary; }
-.secondary { color: $secondary; }
-.secondary-bg { background-color: $secondary; }
-.tertiary { color: $tertiary; }
-.tertiary-bg { background-color: $tertiary; }
 .alt { color: $secondary; };
 .em { color: $tertiary; };
 .thin { font-weight: 200; }
 .huge { font-size: 2em; }
 .big { font-size: 1.5em; }
 .small { font-size: .8em; }
-.strike { text-decoration: line-through; }
-.dark { color: $dark; }
 .dark-bg { background-color: $dark; }
-.light { color: $light; }
-.light-bg { background-color: $light; }
 .alt-bg { background-color: $secondary; };
 
 // Simple 12-columns grid system
@@ -222,4 +219,32 @@ blockquote {
     top: 0 !important;
     left: 0 !important;
   }
+}
+
+// Custom CSS (@MarioFernandez)
+// ---------------------------------------------------------------------------
+.transition {
+  background-color: $primary;
+  vertical-align: middle;
+  text-align: center;
+  &, h1, h2 { color: $text-light; }
+}
+
+.bubble {
+  color: $light;
+  background-color: $text-dark;
+  border-radius: 50%;
+  opacity: 0.8;
+  padding: 0.7rem 0.9rem;
+}
+
+.code {
+  font-size: .7em;
+}
+
+.image-grid p {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 15px;
 }
