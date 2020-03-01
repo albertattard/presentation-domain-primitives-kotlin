@@ -32,13 +32,13 @@ class: impact
 
 # Order Number
 
-An order number is a 10-digit number as shown next:
+Take the example of an order number for *Build-to-Order* items, represented as a 10-digit number:
 
 ```
 0980810031
 ```
 
-The exception is for Stock, whose orders have a `-` as their second digit:
+There is an exception for *Build-to-Stock* items, whose orders have a `-` as their second digit:
 
 ```
 0-21200545
@@ -97,15 +97,13 @@ println("$order")
 
 The above code will compile, even though the provided `String` is not an *Order Number*.
 
-So the `String` data type is too generic and we need to cater for that
-
 ---
 
 # A Possible Solution
 
 We could add validation to ensure that the values passed are *Order Number*s.
 
-Take for example this function for checking whether something is really an *Order Number*:
+Take this function for checking whether something is really an *Order Number*:
 
 ```kotlin
 object OrderNumberValidation {
@@ -119,7 +117,11 @@ object OrderNumberValidation {
 }
 ```
 
-Then we could use `init` to check an argument before using it, and fail accordingly:
+---
+
+# Validation
+
+We could use `init` block to check an argument before using it, and fail accordingly:
 
 ```kotlin
 data class Order(val orderNumber: String) {
@@ -127,7 +129,7 @@ data class Order(val orderNumber: String) {
 }
 ```
 
-We can use the same approach for all the other usages.
+We can use a similar approach for all the other usages.
 
 ---
 
@@ -135,7 +137,7 @@ We can use the same approach for all the other usages.
 
 A test needs to be added for every function that takes an *Order Number* as its input.
 
-This will pollute the tests as we need to make sure that the inputs are properly checked:
+But this will pollute the tests, because we need to make sure that inputs are properly checked:
 
 ```kotlin
 @Test
@@ -160,7 +162,7 @@ fun aFunctionThatTakeAString(string: String) {}
 aFunctionThatTakeAString(42)
 ```
 
-We don't need to have tests for these cases as the compiler will handle them.
+We don't need to have tests for these cases.  The compiler will handle them.
 
 ---
 
@@ -168,7 +170,7 @@ We don't need to have tests for these cases as the compiler will handle them.
 
 .center[![Center-aligned image](assets/images/Test Pyramid.png)]
 
-TODO: See alternatives for compilers for languages that do not use one, such as Php or Javascript
+TODO: Add alternatives for compilers, such as linting, for languages that do not use one, such as PHP or JavaScript
 
 ---
 
@@ -177,10 +179,10 @@ TODO: See alternatives for compilers for languages that do not use one, such as 
 Instead of using a *language primitive* to represent our data types, we can use a *domain primitive*:
 
 ```kotlin
-data class OrderNumber private constructor(val value: String) { 
+data class OrderNumber private constructor(val value: String) {
   companion object {
     @Throws(IllegalArgumentException::class)
-    operator fun invoke(value: String): OrderNumber { 
+    operator fun invoke(value: String): OrderNumber {
       require(value.length == 10) { "Invalid order number" }
       return OrderNumber(value)
     }
@@ -192,7 +194,7 @@ data class OrderNumber private constructor(val value: String) {
 
 # Is this a *Value Object*?
 
-*Domain Primitives* are sometimes referred to as *Value Objects*, but there are some key differences.
+*Domain Primitives* are sometimes referred to as *Value Objects*, but there are some important differences.
 
 *Value Objects* are usually used to represent types that are not available as a *language primitive*, such as `Money` or `Address`.
 
@@ -242,10 +244,10 @@ The above will not compile.
 We now need only to make sure that only valid `OrderNumber`s can be created, and fail accordingly:
 
 ```kotlin
-@Test 
-fun `should throw an exception when given an invalid order number`() { 
-  val invalidOrdersNumbers = 
-        listOf("", "too long to be a valid order number") 
+@Test
+fun `should throw an exception when given an invalid order number`() {
+  val invalidOrdersNumbers =
+        listOf("", "too long to be a valid order number")
   invalidOrdersNumbers.forEach {
     assertFailsWith<IllegalArgumentException> { OrderNumber(it) }
   }
@@ -278,7 +280,7 @@ sealed class OrderNumber {
 
 # Streamlined Usage
 
-Sealed classes are the preferred option, as these streamline the usage:
+Sealed classes are the preferred option, as these streamline usage:
 
 ```kotlin
 when(OrderNumber("some random string")) {
@@ -287,7 +289,7 @@ when(OrderNumber("some random string")) {
 }
 ```
 
-(Note: This example did not include a `companion object` in the `OrderNumber` class due to slide size constraints.)
+(*Note: This example did not include a `companion object` in the `OrderNumber` class due to slide size constraints.*)
 
 ---
 
@@ -299,47 +301,47 @@ class: impact
 
 # To Err is Human
 
-Air Canada Flight 143 ran out of fuel on July 23, 1983, at an altitude of 41,000 feet (12,000 m), midway through the flight
+Air Canada Flight 143 ran out of fuel on July 23, 1983, at an altitude of 41,000 feet (12,000 m), midway through the flight.
 
-The use of the incorrect conversion factor led to a total fuel load of only 22,300 pounds (10,100 kg) rather than the 22,300 kilograms that was needed
+The use of an incorrect conversion factor led to a total fuel load of only 22,300 pounds (10,100 kg), less than half of the 22,300 kg that was needed.
 
-The crew was able to glide the Boeing 767 aircraft safely to an emergency landing
+Fortunately, the crew was able to glide the Boeing 767 safely to an emergency landing.
 
 .center[![Center-aligned image](assets/images/Flight 143 after landing at Gimli Manitoba.png)]
 
 ---
 
-# Bigger than we think
+# Bigger Than We Think
 
-NASA’s Climate Orbiter was lost on September 23, 1999, due to metric/imperial mishap
+NASA's Climate Orbiter was lost on September 23, 1999, due to an metric/imperial mishap.
 
 .center[![Center-aligned image](assets/images/Climate Orbiter.png)]
 
 ---
 
-# A Simple Example 
+# A Simple Example
 
-Let say that we have an air-conditioner controller that works with Celsius and has the following function, which is used to control the power of the compressor 
+Let's say we have an air-conditioning controller that works with Celsius. It has the following function, which is used to control the power of the compressor:
 
 ```kotlin
 fun adjustPower(celsius: Double) {  }
 ```
 
-Say that the temperature is `18°C`, but by mistake the Fahrenheit equivalent is provided instead (`64.4°F`)
+Say that the temperature is `18°C`, but by mistake the Fahrenheit equivalent is provided instead (`64.4°F`).
 
 ```kotlin
 adjustPower(64.4) /* by mistake instead of 18 */
 ```
 
-The controller will think that it's too hot and will put the air-conditioner to full power
+The controller will think that it's too hot, and will put the air conditioner to full power.
 
 ---
 
-# How can we Mitigate such Problems?
+# How Can We Mitigate Such Problems?
 
-While we can easily convert between one temperature unit to another, we cannot tell in which unit the temperature is by just looking at the number
+While we can easily convert between one temperature unit to another, we cannot tell units apart just by looking at the number.
 
-Can we use an `enum` to identify the unit, as shown next?
+Can we use an `enum` to identify the unit?:
 
 ```kotlin
 enum class TemperatureUnit {
@@ -353,7 +355,7 @@ fun adjustPower(temperature: Double, unit: TemperatureUnit) {  }
 
 # Another Approach
 
-Using `enum` will work, but we can do better
+Using `enum` will work, but we can do better.
 
 ```kotlin
 sealed class Temperature {
@@ -368,7 +370,7 @@ sealed class Temperature {
 
 ---
 
-# How Does This Works? 
+# How Does This Work?
 
 ```kotlin
 data class Celsius(val value: Double) : Temperature() {
@@ -386,9 +388,9 @@ data class Fahrenheit(val value: Double) : Temperature() {
 
 ---
 
-# Improved Controller 
+# Improved Controller
 
-The controller can now take any type of temperature unit and can safely convert it to the required type
+The controller can now take any type of temperature unit, and safely convert it to the required type:
 
 ```kotlin
 fun adjustPower(temperature: Temperature) {  
@@ -397,23 +399,23 @@ fun adjustPower(temperature: Temperature) {
 }
 ```
 
-This will ensure that the controller always work with Celsius, irrespective of the temperature unit provided
+This will ensure that the controller always works with Celsius, irrespective of the temperature unit provided.
 
 ---
 
 # Beyond Conversions
 
-The ambiguity problem goes beyond simple conversions
+The ambiguity problem goes beyond simple conversions.
 
-Say you have a function that sets an order's delivery date as shown next
+Say we have a function that sets an order's delivery date:
 
 ```kotlin
 fun dispatchOrderOn(a: Int, b: Int, c: Int) { }
 ```
 
-This function takes the day of the month, the month and the year as its parameters
+This function takes the day of the month, the month, and the year as its parameters.
 
-By looking at the method signature, can you tell which is the month parameter and is it `0` based (that is, `0` is equivalent to January)?
+But looking at the function's signature, can you tell which is the month parameter? Is it zero-based (where `0` represents January)?
 
 ---
 
@@ -431,21 +433,21 @@ How many times have we printed a password, or other sensitive information, by mi
 data class Credentials(val username: String, val password: String)
 
 val credentials = Credentials("username",
-      "a very secure long password that it is very hard to guess")
+      "a very secure long password that is very hard to guess")
 println("Logging into the system using: $credentials")
 ```
 
-The above example will print the very long and secure password
+The example above will print the very long and secure password.
 
 ```
-... password=a very secure long password that it is very hard to guess
+... password=a very secure long password that is very hard to guess
 ```
 
 ---
 
-# How can we prevent that?
+# How Can We Prevent This?
 
-We can prevent the password from being printed by using a domain primitive and overriding the `toString()` function
+We could prevent the password from being printed by using a domain primitive and overriding the `toString()` function:
 
 ```kotlin
 data class Password(val value: String) {
@@ -457,39 +459,35 @@ data class Password(val value: String) {
 
 ---
 
-# But what about …
+# But What About …
 
-We can still print the password by getting its value
+But we can still print the password by getting its value:
 
 ```kotlin
 val credentials = Credentials(
   Username("username"),
-  Password("a very secure long password that it is very hard to guess")
+  Password("a very secure long password that is very hard to guess")
 )
 println("Password: ${credentials.password.value}")
 ```
 
-The above example will still print the password value
+The above example will still print the password value.
 
 ```
-Password: a very secure long password that it is very hard to guess
+Password: a very secure long password that is very hard to guess
 ```
 
 ---
 
-# Can we address this somehow?
+# Can We Address This Somehow?
 
-This is an area where domain primitives shine
+This is an area where domain primitives shine.
 
-Say that in our context, the password is only required to be read once, just to log into the system
-
-If the password is read more than once, then we should fail as that's not the expected behaviour
-
-Any unplanned reads will not go unnoticed
+Let's say that in our context, the password is only required to be read once, just to log into the system — so if the password is read more than once, we should fail.
 
 ---
 
-# How can we do that? 
+# How Can We Do That?
 
 ```kotlin
 class Password(value: String) {
@@ -509,7 +507,7 @@ class Password(value: String) {
 
 ---
 
-# How does this work? 
+# How Does This Work?
 
 ```kotlin
 val credentials = Credentials(Username("a"), Password("b"))
@@ -521,7 +519,7 @@ println("First try: ${credentials.password.value}")
 println("Second try: ${credentials.password.value}")
 ```
 
-Any unexpected reads will not go unnoticed
+Any unexpected reads will not go unnoticed.
 
 ```
 java.lang.IllegalStateException: Password was already consumed
@@ -529,11 +527,11 @@ java.lang.IllegalStateException: Password was already consumed
 
 ---
 
-# Is this a Silver Bullet? 
+# Is This a Silver Bullet?
 
 No!!
 
-We can always store the password in a language primitive, such as `String`, and then print this variable as many times we want to 
+We could always store the password in a language primitive, such as `String`, and then print this variable as many times we want to .
 
 ```kotlin
 val credentials = Credentials(Username("a"), Password("b"))
@@ -553,11 +551,11 @@ class: impact
 
 ---
 
-# Coupling with Language Primitives 
+# Coupling with Language Primitives
 
-Say that we need to schedule some tasks to run every so ofter, like a cron job
+Say that we need to schedule some tasks to run every so often, like a cron job.
 
-One way to do this is to use the `java.util.Timer` and `java.util.TimerTask` classes as shown next
+One way to do this would be to use the `java.util.Timer` and `java.util.TimerTask` classes:
 
 ```kotlin
 val task = object : TimerTask() {
@@ -572,21 +570,21 @@ timer.scheduleAtFixedRate(task, 1000, 1000)
 
 ---
 
-# What's wrong with that? 
+# What's Wrong with That?
 
-Without an abstraction layer between the language primitives types and the application, swapping the `java.util.Timer` class could be harder than expected
+Without an abstraction layer between the language primitives and the application, swapping the `java.util.Timer` class could be harder than expected.
 
-For example, the `java.util.Timer`, will stop running if the `java.util.TimerTask` throws a `RuntimeException`
+For example, the `java.util.Timer` will stop running if the `java.util.TimerTask` throws a `RuntimeException`.
 
-That's may be unexpected behaviour and you would like to swap the `java.util.Timer` class to the `java.util.concurrent.ScheduledExecutorService` class
+That may be unexpected behaviour, and you would like to swap the `java.util.Timer` class to the `java.util.concurrent.ScheduledExecutorService` class.
 
-Having tight coupling between the application and the `java.util.Timer`, swapping may prove harder than expected
+With tight coupling between the application and the `java.util.Timer`, swapping may prove harder than expected.
 
 ---
 
-# Introducing an Abstraction Layer 
+# Introducing an Abstraction Layer
 
-*Domain Primitives* can act as an abstraction layer between the *Language Primitives*, such as the `java.util.Timer` class, and the rest of the application
+*Domain Primitives* can act as an abstraction layer between the *Language Primitives*, such as the `java.util.Timer` class, and the rest of the application.
 
 ```kotlin
 class CronJobTask { }
@@ -594,7 +592,7 @@ class CronJobTask { }
 class CronJob {
 
     fun runAtFixRate(
-          initialDelay: InitialDelay, 
+          initialDelay: InitialDelay,
           delay: Delay,
           block: () -> Any
         ): CronJobTask { }
@@ -603,11 +601,11 @@ class CronJob {
 
 ---
 
-# Simplifying Refactoring 
+# Simplifying Refactoring
 
-Swapping the internals of the `CronJob` and `CronJobTask` classes should not effect any other part of the application
+Swapping the internals of the `CronJob` and `CronJobTask` classes should not affect any other part of the application.
 
-Tests can ensure that these domain primitives are still behaving as expected, especially after swapping their internals
+Tests can ensure that these domain primitives are still behaving as expected, especially after swapping their internals.
 
 ---
 
@@ -619,15 +617,15 @@ class: impact
 
 # Verbosity
 
-Domain primitives may reduce ambiguity and improve security, but at the expense of verbosity
+Domain primitives may reduce ambiguity and improve security, but at the cost of verbosity.
 
-Consider a function that takes two integers
+Consider a function that takes two integers:
 
 ```kotlin
 original.slice(1, 2)
 ```
 
-An alternative approach that uses domain primitives is quite more verbose
+An alternative approach that uses domain primitives is quite a bit more verbose:
 
 ```kotlin
 original.slice(Range(StartIndex(1), Length(2)))
@@ -637,19 +635,19 @@ original.slice(Range(StartIndex(1), Length(2)))
 
 # Compatibility
 
-Language primitives are compatible to other libraries, while domain primitives are not and need to be converted back and forth
+Language primitives are compatible to other libraries, while domain primitives are not and need to be converted back and forth.
 
-For example, we cannot save a domain primitive representing a persons' name, such as `PersonName`, into a database.  We need to get the `String` equivalent 
+For example, we cannot save a domain primitive representing a person's name, such as `PersonName`, into a database.  We need to get the `String` equivalent.
 
 ---
 
 # Class Explosion
 
-The same domain primitive cannot be reused for different purposes as each domain primitive should serve one purpose
+The same domain primitive cannot be reused for different purposes, since each domain primitive should serve one purpose.
 
-For example, *name* and *surname* should be represented by two domain primitives, such as `Name` and `Surname`, and not by one, generic, domain primitive, such as `GenericName`
+For example, *name* and *surname* should be represented by two domain primitives, such as `Name` and `Surname`, and not by one, generic, domain primitive, such as `GenericName`.
 
-This may lead to class explosion as many classes are needed
+This may lead to class explosion as many classes are needed.
 
 ---
 
