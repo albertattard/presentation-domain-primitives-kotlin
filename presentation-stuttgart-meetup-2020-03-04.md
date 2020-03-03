@@ -24,6 +24,16 @@ Programmers._name_ @ **Thought**Works .com
 
 ---
 
+# Agenda
+
+## Representation
+## Ambiguity
+## Security
+## Tight Coupling
+## Shortcomings
+
+---
+
 class: impact
 
 # Representation
@@ -91,8 +101,15 @@ There is something particular about *Order Number*s that we need to capture in o
 For example, let's say we pass a random `String` to a function that requires an *Order Number*:
 
 ```kotlin
-val order = Order("any random string will do")
-println("$order")
+Order("any random string will do")
+```
+
+```kotlin
+OrderGateway.fetch("any random string will do")
+```
+
+```kotlin
+OrderRepository.delete("any random string will do")
 ```
 
 The above code will compile, even though the provided `String` is not an *Order Number*.
