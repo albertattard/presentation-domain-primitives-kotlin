@@ -608,11 +608,11 @@ class CronJobTask { }
 
 class CronJob {
 
-    fun runAtFixRate(
-          initialDelay: InitialDelay,
-          delay: Delay,
-          block: () -> Any
-        ): CronJobTask { }
+  fun runAtFixRate(
+      initialDelay: InitialDelay,
+      delay: Delay,
+      block: () -> Any
+  ): CronJobTask { }
 }
 ```
 

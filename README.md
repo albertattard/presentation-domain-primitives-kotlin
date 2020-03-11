@@ -4,6 +4,12 @@ Software bugs have cost lots of money and in some cases killed people.  This imp
 
 In this presentation, we will discuss such problems and also show alternative approaches, that can be applied to mitigate unwanted behaviour.
 
+.center[![Center-aligned image](assets/photos/2020-03-04/Photo 6.jpg)]
+
+## Meetups
+
+1. https://www.meetup.com/en-AU/meetup-group-LNHuxrrO/events/268624312/
+
 ## Running the Presentation
 
 This presentation is rendered by [Backslide](https://www.npmjs.com/package/backslide), a command line tool for making HTML presentations with [Remark.js](https://github.com/gnab/remark) using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
