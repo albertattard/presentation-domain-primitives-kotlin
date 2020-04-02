@@ -18,15 +18,15 @@ class: impact
 
 class: impact
 
-## Albert Attard & Cristian Benedit
+## Albert Attard
 
-Programmers._name_ @ **Thought**Works .com
+*albert.attard@thoughtworks.com*
 
 ---
 
 # Agenda
 
-## Representation
+## Data Representation
 ## Ambiguity
 ## Security
 ## Tight Coupling
@@ -36,7 +36,7 @@ Programmers._name_ @ **Thought**Works .com
 
 class: impact
 
-# Representation
+# Data Representation
 
 ---
 
@@ -101,11 +101,11 @@ There is something particular about *Order Number*s that we need to capture in o
 For example, let's say we pass a random `String` to a function that requires an *Order Number*:
 
 ```kotlin
-Order("any random string will do")
+val order = Order("any random string will do")
 ```
 
 ```kotlin
-OrderGateway.fetch("any random string will do")
+val order = OrderGateway.fetch("any random string will do")
 ```
 
 ```kotlin
@@ -148,13 +148,20 @@ data class Order(val orderNumber: String) {
 
 We can use a similar approach for all the other usages.
 
+```kotlin
+object OrderGateway {
+  fun fetch(orderNumber: String): Order {
+    OrderNumberValidation.check(orderNumber)
+    /* ... */
+  }
+}
+```
+
 ---
 
 # Polluted Tests
 
-A test needs to be added for every function that takes an *Order Number* as its input.
-
-But this will pollute the tests, because we need to make sure that inputs are properly checked:
+A test needs to be added for every function that takes an *Order Number* as its input to make sure that these functions are failing as expected.
 
 ```kotlin
 @Test
@@ -164,6 +171,8 @@ fun `should throw an exception if passed an invalid order number`() {
   }
 }
 ```
+
+This will pollute the tests, because we need to make sure that inputs are properly checked by each recipient function.
 
 ---
 
@@ -193,7 +202,7 @@ TODO: Add alternatives for compilers, such as linting, for languages that do not
 
 # Alternative Approach
 
-Instead of using a *language primitive* to represent our data types, we can use a *domain primitive*:
+Instead of using a *language primitive*, such as `String`, to represent our data types, we can use a *domain primitive*:
 
 ```kotlin
 data class OrderNumber private constructor(val value: String) {
@@ -306,7 +315,7 @@ when(OrderNumber("some random string")) {
 }
 ```
 
-(*Note: This example did not include a `companion object` in the `OrderNumber` class due to slide size constraints.*)
+*Note: This example did not include a `companion object` in the `OrderNumber` class due to slide size constraints.*
 
 ---
 
@@ -432,7 +441,7 @@ fun dispatchOrderOn(a: Int, b: Int, c: Int) { }
 
 This function takes the day of the month, the month, and the year as its parameters.
 
-But looking at the function's signature, can you tell which is the month parameter? Is it zero-based (where `0` represents January)?
+Buy just looking at the function's signature, can you tell which is the month parameter, and whether it is zero-based (where `0` represents January) or not?
 
 ---
 
@@ -444,54 +453,58 @@ class: impact
 
 # Leaking Sensitive Information
 
-How many times have we printed a password, or other sensitive information, by mistake?
+How many times have we printed a credit-card number, or other sensitive information, by mistake?
 
 ```kotlin
-data class Credentials(val username: String, val password: String)
+data class CreditCardNumber(val value: Long)
 
-val credentials = Credentials("username",
-      "a very secure long password that is very hard to guess")
-println("Logging into the system using: $credentials")
+val number = CreditCardNumber(5555_5555_5555_5555)
+println("Paying with: $number")
 ```
 
-The example above will print the very long and secure password.
+The example above will print the credit card number
 
 ```
-... password=a very secure long password that is very hard to guess
+Paying with: CreditCardNumber(value=5555555555555555)
 ```
 
 ---
 
 # How Can We Prevent This?
 
-We could prevent the password from being printed by using a domain primitive and overriding the `toString()` function:
+We could prevent the credit card number from being printed by overriding the `toString()` function:
 
 ```kotlin
-data class Password(val value: String) {
+data class CreditCardNumber(val value: Long) {
+
+  private val maskedValue = "xxxx-xxxx-xxxx-${value % 10000}"
 
   override fun toString() =
-    "--(masked password)--"
+    maskedValue
 }
+```
+
+This time the credit card number is masked
+
+```
+Paying with: xxxx-xxxx-xxxx-5555
 ```
 
 ---
 
 # But What About …
 
-But we can still print the password by getting its value:
+But we can still print the credit card number by getting its value:
 
 ```kotlin
-val credentials = Credentials(
-  Username("username"),
-  Password("a very secure long password that is very hard to guess")
-)
-println("Password: ${credentials.password.value}")
+val number = CreditCardNumber(5555_5555_5555_5555)
+println("Paying with: ${number.value}")
 ```
 
-The above example will still print the password value.
+The above example will still print the credit card number.
 
 ```
-Password: a very secure long password that is very hard to guess
+Paying with: 5555555555555555
 ```
 
 ---
@@ -500,25 +513,25 @@ Password: a very secure long password that is very hard to guess
 
 This is an area where domain primitives shine.
 
-Let's say that in our context, the password is only required to be read once, just to log into the system — so if the password is read more than once, we should fail.
+Let's say that **in our context**, the credit card number is only required to be read once, just to make the payment — so if the credit card number is read more than once, we should fail.
 
 ---
 
 # How Can We Do That?
 
 ```kotlin
-class Password(value: String) {
+class CreditCardNumber(value: Long) {
 
   private val consumed = AtomicBoolean()
 
-  val value: String = value
-      get() =
-          if (consumed.compareAndSet(false, true)) field
-          else throw IllegalStateException(
-                         "Password was already consumed")
+  val value: Long = value
+    get() =
+      if (consumed.compareAndSet(false, true)) field
+      else throw IllegalStateException(
+            "Credit card number was already consumed"
+      )
 
-  override fun toString() =
-      "--(masked password)--"
+  /* Other properties and functions removed for brevity */
 }
 ```
 
@@ -527,19 +540,19 @@ class Password(value: String) {
 # How Does This Work?
 
 ```kotlin
-val credentials = Credentials(Username("a"), Password("b"))
+val number = CreditCardNumber(5555_5555_5555_5555)
 
 /* The first time will work */
-println("First try: ${credentials.password.value}")
+println("First try: ${number.value}")
 
 /* The second time will throw an exception */
-println("Second try: ${credentials.password.value}")
+println("Second try: ${number.value}")
 ```
 
 Any unexpected reads will not go unnoticed.
 
 ```
-java.lang.IllegalStateException: Password was already consumed
+java.lang.IllegalStateException: Credit card number was already consumed
 ```
 
 ---
@@ -548,15 +561,15 @@ java.lang.IllegalStateException: Password was already consumed
 
 No!!
 
-We could always store the password in a language primitive, such as `String`, and then print this variable as many times we want to .
+We could always store the credit card number in a language primitive, such as `Long`, and then print this variable as many times we want to.
 
 ```kotlin
-val credentials = Credentials(Username("a"), Password("b"))
-val password = credentials.password.value
+val number = CreditCardNumber(5555_5555_5555_5555)
+val value = number.value
 
-/* Now we can print the password as many times we want */
+/* Now we can print the credit card number as many times we want */
 repeat(100) {
-  println("Password: $password")
+  println("Credit card number: $value")
 }
 ```
 

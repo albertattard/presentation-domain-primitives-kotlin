@@ -4,11 +4,12 @@ Software bugs have cost lots of money and in some cases killed people.  This imp
 
 In this presentation, we will discuss such problems and also show alternative approaches, that can be applied to mitigate unwanted behaviour.
 
-.center[![Center-aligned image](assets/photos/2020-03-04/Photo 6.jpg)]
+![Presentation](assets/photos/2020-03-04/Photo%206.jpg)
 
 ## Meetups
 
-1. https://www.meetup.com/en-AU/meetup-group-LNHuxrrO/events/268624312/
+1. [Stuttgart - 4th of March 2020](https://www.meetup.com/en-AU/meetup-group-LNHuxrrO/events/268624312/)
+1. [Remote - 16th of April 2020](https://www.meetup.com/de-DE/ThoughtWorks-Berlin/events/269785269/)
 
 ## Running the Presentation
 
