@@ -15,16 +15,16 @@ In this presentation, we will discuss such problems and also show alternative ap
 
 This presentation is rendered by [Backslide](https://www.npmjs.com/package/backslide), a command line tool for making HTML presentations with [Remark.js](https://github.com/gnab/remark) using [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
 
-You can install Backslide, using `npm`
+Setup the project
 
 ```bash
-$ npm install -g backslide
+$ npm install
 ```
 
-You can run the presentation using the `bs` command
+You can run the presentation, using
 
 ```bash
-$ bs serve
+$ npm start
 ```
 
 This will start the presentation in the browser, usually [http://localhost:4100](http://localhost:4100).

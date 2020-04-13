@@ -1,0 +1,25 @@
+{
+  "name": "presentation-domain-primitives-kotlin",
+  "version": "1.0.0",
+  "description": "Domain Primitives Presentation",
+  "scripts": {
+    "start": "./node_modules/backslide/bin/bs serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertattard/presentation-domain-primitives-kotlin.git"
+  },
+  "keywords": [
+    "domain",
+    "primitives"
+  ],
+  "author": "Albert Attard",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/albertattard/presentation-domain-primitives-kotlin/issues"
+  },
+  "homepage": "https://github.com/albertattard/presentation-domain-primitives-kotlin#readme",
+  "dependencies": {
+    "backslide": "^2.6.0"
+  }
+}

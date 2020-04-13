@@ -1,9 +1,11 @@
 .gradle
-.tmp
 .idea
-out
+.tmp
 build
+node_modules
+out
 *.iml
 *.ipr
 *.iws
 **/.DS_Store
+package-lock.json
