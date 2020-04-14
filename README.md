@@ -21,7 +21,7 @@ Setup the project
 $ npm install
 ```
 
-You can run the presentation, using
+Run the presentation
 
 ```bash
 $ npm start
