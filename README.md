@@ -9,7 +9,7 @@ In this presentation, we will discuss such problems and also show alternative ap
 ## Meetups
 
 1. [Stuttgart - 4th of March 2020](https://www.meetup.com/en-AU/meetup-group-LNHuxrrO/events/268624312/)
-1. [Remote - 16th of April 2020](https://www.meetup.com/de-DE/ThoughtWorks-Berlin/events/269785269/)
+1. [Remote - 16th of April 2020](https://www.meetup.com/de-DE/ThoughtWorks-Berlin/events/269785269/) ([Zoom - 372940397](https://thoughtworks.zoom.us/j/372940397))
 
 ## Running the Presentation
 
