@@ -322,6 +322,16 @@ when(OrderNumber("some random string")) {
 
 ---
 
+# Usage
+
+Another subtle advantage of *Domain Primitive*s over *Language Primitive*s is that with *Domain Primitive*s it is very easy to see where the value is being used.
+
+The IDEes can easily list all usages of a type.
+
+On the other hand, when using *Language Primitive*s, it is hard to find all places where the value is being used as a different variable name maybe used in different places.
+
+---
+
 class: impact
 
 # Ambiguity
