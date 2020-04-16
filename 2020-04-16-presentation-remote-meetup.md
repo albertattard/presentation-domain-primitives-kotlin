@@ -6,6 +6,9 @@ layout: true
 .bottom-bar[
   {{title}}
 ]
+---
+
+class: demand
 
 ---
 
@@ -690,6 +693,4 @@ Please send any feedback to: albert.attard@thoughtworks.com
 
 ---
 
-class: impact
-
-.center.hiring[![TW Careers](assets/images/TW Careers 1.png)]
+class: careers

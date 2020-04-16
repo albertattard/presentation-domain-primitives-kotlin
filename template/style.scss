@@ -83,6 +83,34 @@ blockquote {
   h1 { font-size: $font-size-impact; }
 }
 
+.demand {
+  background-image: url("../assets/images/TW Demand 1.png");
+
+  height: 100%;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.demand .bottom-bar {
+  display: none;
+}
+
+.careers {
+  background-image: url("../assets/images/TW Careers 2.png");
+
+  height: 100%;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.careers .bottom-bar {
+  display: none;
+}
+
 .hiring {
   background-color: $primary;
   vertical-align: middle;
